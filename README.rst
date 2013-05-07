@@ -1,6 +1,14 @@
 Installation
 =============
 
+Debian packages::
+
+    # aptitude install git-core
+
+If you do not already have python2.7 installed::
+
+    # aptitude install python2.7
+
 With ssh git::
 
     $ git clone git://github.com/hackable-devices/makerbot_tools.git
