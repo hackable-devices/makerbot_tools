@@ -11,6 +11,8 @@ var_directory = os.path.join(dirname, 'var')
 if not os.path.isdir(var_directory):
     os.makedirs(var_directory)
 
+os.chdir(dirname)
+
 
 def conveyor_server():
     from conveyor.server.__main__ import _main
