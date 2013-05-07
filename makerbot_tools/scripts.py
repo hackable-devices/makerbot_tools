@@ -3,7 +3,9 @@ import signal
 import sys
 import os
 
-dirname = os.path.abspath(sys.argv[0]).split('/bin/')[0]
+dirname = os.path.abspath(__file__)
+dirname = os.path.dirname(dirname)
+dirname = os.path.dirname(dirname)
 var_directory = os.path.join(dirname, 'var')
 
 if not os.path.isdir(var_directory):
