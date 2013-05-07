@@ -13,7 +13,7 @@ if not os.path.isdir(var_directory):
 def conveyor_server():
     from conveyor.server.__main__ import _main
     if '-c' not in sys.argv:
-        sys.argv[1:1] = ['-c', 'conveyor-dev.conf']
+        sys.argv[1:1] = ['-c', os.path.join(dirname, 'conveyor-dev.conf')]
     if 'stop' in sys.argv:
         pid = os.path.join(var_directory, 'conveyord.pid')
         if os.path.isfile(pid):
@@ -30,7 +30,7 @@ def conveyor_server():
 def conveyor_client():
     from conveyor.client.__main__ import _main
     if '-c' not in sys.argv:
-        sys.argv[1:1] = ['-c', 'conveyor-dev.conf']
+        sys.argv[1:1] = ['-c', os.path.join(dirname, 'conveyor-dev.conf')]
     sys.exit(_main(sys.argv))
 
 
