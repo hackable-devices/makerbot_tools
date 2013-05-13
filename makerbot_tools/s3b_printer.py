@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+import time
 import makerbot_driver
 import optparse
+import logging
+
+
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+log = logging.getLogger('s3b')
 
 
 def main():
@@ -49,13 +55,19 @@ def main():
     parser.environment.update(variables)
     parser.state.values["build_name"] = filename[:15]
 
+    log.info('Using %s on %s with %s', factory, port, variables)
+
     def exec_line(line):
         while True:
             try:
                 parser.execute_line(line)
+                log.info(line)
                 break
             except makerbot_driver.BufferOverflowError:
-                parser.s3g.writer._condition.wait(.2)
+                try:
+                    parser.s3g.writer._condition.wait(.2)
+                except RuntimeError:
+                    time.sleep(.2)
 
     if options.sequences:
         for line in start_gcode:
