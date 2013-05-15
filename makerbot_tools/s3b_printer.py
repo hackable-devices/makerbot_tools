@@ -7,7 +7,7 @@ import optparse
 import logging
 
 
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 log = logging.getLogger('s3b')
 
 
@@ -61,7 +61,6 @@ def main():
         while True:
             try:
                 parser.execute_line(line)
-                log.info(line)
                 break
             except makerbot_driver.BufferOverflowError:
                 try:
