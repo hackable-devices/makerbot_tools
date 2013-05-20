@@ -37,9 +37,17 @@ Launch the server::
 
     $ sudo bin/conveyor-server [start|stop]
 
-Print something::
+Launch the webserver::
+
+    $ ./server.py
+
+Validate and Print something::
 
     $ bin/print file.gcode
+
+Print something directly::
+
+    $ bin/s3b_print file.gcode
 
 Print useful informations::
 
