@@ -31,7 +31,7 @@
   </head>
 
   <body>
-
+    <!--
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -46,30 +46,39 @@
               <li><a href="/">Home</a></li>
               <li><a href="/upload">Upload</a></li>
             </ul>
-          </div><!--/.nav-collapse -->
+          </div>
         </div>
       </div>
     </div>
+    -->
 
     <div class="container">
 
       <!-- The container for the uploaded files -->
       <div id="error" class="text-error"></div>
       <br>
-      <div id="files"></div>
+      <fieldset>
+        <legend>Printer</legend>
+        <div id="printers"></div>
+      </fieldset>
       <br>
-      <span class="btn btn-success fileinput-button">
-          <i class="icon-plus icon-white"></i>
-          <span>Add new file...</span>
-          <!-- The file input field used as target for the file upload widget -->
-          <input id="fileupload" type="file" name="file" multiple>
-      </span>
-      <br>
-      <br>
-      <!-- The global progress bar -->
-      <div id="progress" class="progress progress-success progress-striped">
-          <div class="bar"></div>
-      </div>
+      <fieldset>
+        <legend>Files</legend>
+        <div id="files"></div>
+        <br>
+        <span class="btn btn-success fileinput-button">
+            <i class="icon-plus icon-white"></i>
+            <span>Add new file...</span>
+            <!-- The file input field used as target for the file upload widget -->
+            <input id="fileupload" type="file" name="file" multiple>
+        </span>
+        <br>
+        <br>
+        <!-- The global progress bar -->
+        <div id="progress" class="progress progress-success progress-striped">
+            <div class="bar"></div>
+        </div>
+      </fieldset>
 
     </div> <!-- /container -->
 

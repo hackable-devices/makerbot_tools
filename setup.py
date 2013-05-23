@@ -34,5 +34,6 @@ setup(name='makerbot_tools',
       conveyor-ui=makerbot_tools.scripts:serve
       print=makerbot_tools.scripts:conveyor_print
       s3b_print=makerbot_tools.s3b_printer:main
+      s3b_card_files=makerbot_tools.s3b_card_files:main
       """,
       )

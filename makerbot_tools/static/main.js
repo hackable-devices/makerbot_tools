@@ -8,9 +8,9 @@ $.fn.extend({
         files.empty()
         $.each(data, function (index, file) {
             node = $(
-                '<p>' + file.name + ' ' +
-                '<a class="btn btn-info btn-small"' +
-                '   href="' + file.print_url + '">print</a>' +
+                '<p class="file">' + file.name + ' ' +
+                // '<a class="btn btn-info btn-small"' +
+                // '   href="' + file.print_url + '">print</a>' +
                 '</p>'
             );
             node.appendTo('#files');
@@ -18,15 +18,40 @@ $.fn.extend({
         return files;
     },
     getFiles: function () {
-        files = this;
+        node = this;
         $.get('/api/files', function(data) {
-            files.showFiles(data.files);
+            node.showFiles(data.files);
         });
-        return files;
+        return node;
+    },
+    showPrinters: function (data) {
+        this.empty();
+        $.each(data, function (index, printer) {
+            if (printer.state != 'DISCONNECTED') {
+                node = $(
+                    '<p>' +
+                    printer.displayName + ' - ' +
+                    printer.uniqueName + ' ' +
+                    printer.state + ' ' +
+                    '</p>'
+                );
+                node.appendTo('#printers');
+            }
+        });
+        return this;
+    },
+    getPrinters: function () {
+        node = this;
+        $.get('/api/printers', function(data) {
+            node.showPrinters(data.result);
+            setTimeout(function () { node.getPrinters() }, 10000);
+        });
+        return node;
     }
 });
 
 $('#progress, #error').hide();
+$('#printers').getPrinters();
 $('#files').getFiles();
 $('#fileupload').fileupload({
     url: '/upload',
