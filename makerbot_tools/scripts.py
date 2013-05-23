@@ -32,7 +32,7 @@ def conveyor_server():
 
 
 def conveyor_client():
-    from conveyor.client.__main__ import _main
+    from .commands import _main
     if '-c' not in sys.argv:
         sys.argv[1:1] = ['-c', os.path.join(dirname, 'conveyor-dev.conf')]
     sys.exit(_main(sys.argv))
@@ -42,3 +42,9 @@ def conveyor_print():
     input_file = os.path.abspath(sys.argv.pop())
     sys.argv[1:] = ['print', '--has-start-end', input_file]
     conveyor_client()
+
+
+def serve():
+    from web import make_app
+    import waitress
+    waitress.serve(make_app())
