@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import subprocess
 import bottle
+import time
 import json
 import glob
 import os
@@ -17,7 +18,6 @@ dirname = os.path.abspath(os.path.dirname(__file__))
 client = os.path.join(
     os.path.dirname(dirname),
     'bin', 'conveyor-client')
-print(client)
 
 bottle.TEMPLATE_PATH.append(
     os.path.join(dirname, 'views')
@@ -31,9 +31,9 @@ def call_client(*args):
     except subprocess.CalledProcessError:
         bottle.abort(500)
     if data.strip():
-        data = dict(status=0, result=json.loads(data))
+        data = dict(result=json.loads(data))
     else:
-        data = dict(status=1)
+        data = dict(result=None)
     return data
 
 
@@ -42,8 +42,14 @@ def client_response(*args):
         return call_client(*args)
     return req
 
+for cmd in ('printers', 'profiles', 'jobs', 'drivers'):
+    bottle.get('/api/' + cmd, callback=client_response(cmd, '-j'))
 
-@bottle.route('/')
+for cmd in ('connect', 'disconnect'):
+    bottle.get('/api/' + cmd, callback=client_response(cmd))
+
+
+@bottle.get('/')
 @bottle.view('index')
 def index():
     return {}
@@ -61,14 +67,20 @@ def files():
     return dict(files=data)
 
 
-bottle.route('/api/printers', callback=client_response('printers'))
-bottle.route('/api/jobs', callback=client_response('jobs'))
-
-
-@bottle.route('/api/print/:filename')
-def print_file():
+@bottle.get('/api/print/:filename')
+def print_file(filename=None):
     # need to interact with client
-    return {}
+    p = subprocess.Popen(
+        [client, 'print', '--has-start-end', filename],
+        close_fds=True,
+    )
+    time.sleep(1)
+    data = call_client('jobs', '-j')
+    if p.poll() is None:
+        # process working
+        return dict(success=True, result=data)
+    else:
+        return dict(success=False, result=data)
 
 
 @bottle.put('/upload')

@@ -31,7 +31,7 @@ setup(name='makerbot_tools',
       [console_scripts]
       conveyor-server=makerbot_tools.scripts:conveyor_server
       conveyor-client=makerbot_tools.scripts:conveyor_client
-      serve=makerbot_tools.scripts:serve
+      conveyor-ui=makerbot_tools.scripts:serve
       print=makerbot_tools.scripts:conveyor_print
       s3b_print=makerbot_tools.s3b_printer:main
       """,
