@@ -43,7 +43,7 @@ class Cmd(conveyor.client._MethodCommand):
         config = conveyor.config.Config(self.config_file, dct)
         address = config.get('common', 'address')
         address = conveyor.address.Address.address_factory(address)
-        self._connection = self.address.connect()
+        self._connection = address.connect()
         self._connection._socket.settimeout(self.timeout)
 
     def run(self):
