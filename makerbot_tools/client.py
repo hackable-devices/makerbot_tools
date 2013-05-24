@@ -14,12 +14,7 @@ class Cmd(conveyor.client._MethodCommand):
         self.method = method
         self.args = args
         self.timeout = timeout
-        with open(config_file) as fp:
-            dct = conveyor.json.load(fp)
-        config = conveyor.config.Config(config_file, dct)
-        address = config.get('common', 'address')
-        address = conveyor.address.Address.address_factory(address)
-        self.address = address
+        self.config_file = config_file
         self._jsonrpc = None
         self._stop = False
         self._code = 0
@@ -35,22 +30,29 @@ class Cmd(conveyor.client._MethodCommand):
             self._event_threads.append(thread)
 
     def _stop_event_threads(self):
-        #self._log.error('end %s', self.method)
         conveyor.stoppable.StoppableManager.stopall()
         for thread in self._event_threads:
             if thread.is_alive():
                 thread.join(1)
 
+    def _get_connection(self):
+        if self._connection is not None:
+            return self._connection
+        with open(self.config_file) as fp:
+            dct = conveyor.json.load(fp)
+        config = conveyor.config.Config(self.config_file, dct)
+        address = config.get('common', 'address')
+        address = conveyor.address.Address.address_factory(address)
+        self._connection = self.address.connect()
+        self._connection._socket.settimeout(self.timeout)
+
     def run(self):
         self._log.debug('running %s(%r)', self.method, self.args)
         try:
-            if self._connection is None:
-                self._connection = self.address.connect()
+            self._get_connection()
         except Exception, e:
             self._log.exception(e)
-            pass
         else:
-            self._connection._socket.settimeout(self.timeout)
             self._init_event_threads()
             self._jsonrpc = conveyor.jsonrpc.JsonRpc(
                 self._connection, self._connection)
@@ -60,7 +62,7 @@ class Cmd(conveyor.client._MethodCommand):
             hello_task.start()
             try:
                 self._jsonrpc.run()
-            except (Exception, socket.error) as e:
+            except Exception as e:
                 self._log.exception(e)
                 self._connection = None
                 self._stop_event_threads()
@@ -84,11 +86,11 @@ lock = threading.Lock()
 def call(config_file, method, args={}, timeout=4):
     lock.acquire_lock(True)
     result = -1, None
+    cmd = Cmd(config_file, method, args, timeout=timeout)
     try:
-        cmd = Cmd(config_file, method, args, timeout=timeout)
         cmd.run()
         result = cmd._code, cmd._result
-    except (Exception, socket.timeout) as e:
+    except Exception as e:
         cmd._log.exception(e)
         cmd._connection = None
     lock.release()
