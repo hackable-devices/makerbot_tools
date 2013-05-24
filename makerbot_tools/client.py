@@ -24,8 +24,8 @@ class Cmd(conveyor.client._MethodCommand):
 
     @classmethod
     def _init_class(cls, config_file, timeout):
-        cls._timeout = timeout
         cls._config_file = config_file
+        cls._timeout = timeout
 
     def _init_event_threads(self):
         eventqueue = conveyor.event.geteventqueue()
@@ -64,6 +64,7 @@ class Cmd(conveyor.client._MethodCommand):
             self._set_connection()
         except Exception, e:
             self._log.exception(e)
+            self._reset_connection()
         else:
             self._init_event_threads()
             self._jsonrpc = conveyor.jsonrpc.JsonRpc(
