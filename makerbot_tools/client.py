@@ -24,8 +24,8 @@ class Cmd(conveyor.client._MethodCommand):
 
     @classmethod
     def _init_class(cls, config_file, timeout):
-        cls.timeout = timeout
-        cls.config_file = config_file
+        cls._timeout = timeout
+        cls._config_file = config_file
 
     def _init_event_threads(self):
         eventqueue = conveyor.event.geteventqueue()
