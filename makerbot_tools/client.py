@@ -20,7 +20,7 @@ class Cmd(conveyor.client._MethodCommand):
         self._code = 0
         self._result = None
         self._event_threads = []
-        self._init_class()
+        self._init_class(config_file, timeout)
 
     @classmethod
     def _init_class(cls, config_file, timeout):
