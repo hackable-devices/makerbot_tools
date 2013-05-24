@@ -68,7 +68,7 @@ $.fn.extend({
 
 $('#progress, #error').hide();
 $('a.brand').getPrinter();
-//$('#jobs').getJobs();
+$('#jobs').getJobs();
 $('#files').getFiles();
 $('#fileupload').fileupload({
     url: '/upload',
