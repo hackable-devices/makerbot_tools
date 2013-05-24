@@ -47,11 +47,12 @@ $.fn.extend({
         return node;
     },
     showPrinter: function (printer) {
-        $('a.brand').text(
+        var value = '' +
             printer.displayName + ' - ' +
             printer.uniqueName + ' ' +
             '(' + printer.state + ') '
-        );
+        $('title').text(value);
+        $('a.brand').text(value);
         return this;
     },
     getPrinter: function () {
