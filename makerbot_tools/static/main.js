@@ -4,8 +4,8 @@ $(function () {
 
 $.fn.extend({
     showFiles: function (data) {
-        files = this;
-        files.empty()
+        container = this;
+        container.empty()
         $.each(data, function (index, file) {
             node = $(
                 '<p class="file">' + file.name + ' ' +
@@ -13,9 +13,9 @@ $.fn.extend({
                 // '   href="' + file.print_url + '">print</a>' +
                 '</p>'
             );
-            node.appendTo('#files');
+            node.appendTo(container);
         });
-        return files;
+        return container;
     },
     getFiles: function () {
         node = this;
@@ -24,34 +24,51 @@ $.fn.extend({
         });
         return node;
     },
-    showPrinters: function (data) {
-        this.empty();
-        $.each(data, function (index, printer) {
-            if (printer.state != 'DISCONNECTED') {
-                node = $(
-                    '<p>' +
-                    printer.displayName + ' - ' +
-                    printer.uniqueName + ' ' +
-                    printer.state + ' ' +
-                    '</p>'
-                );
-                node.appendTo('#printers');
-            }
+    showJobs: function (data) {
+        container = this;
+        container.empty()
+        $.each(data, function (index, item) {
+            node = $(
+                '<p class="job">' + item + ' ' +
+                '</p>'
+            );
+            node.appendTo(container);
         });
+        return container;
+    },
+    getJobs: function () {
+        node = this;
+        $.get('/api/jobs', function(data) {
+            if (data.success && data.result) {
+                node.showJobs(data.result);
+            }
+            setTimeout(function () { node.getJobs() }, 3000);
+        });
+        return node;
+    },
+    showPrinter: function (printer) {
+        $('a.brand').text(
+            printer.displayName + ' - ' +
+            printer.uniqueName + ' ' +
+            '(' + printer.state + ') '
+        );
         return this;
     },
-    getPrinters: function () {
+    getPrinter: function () {
         node = this;
-        $.get('/api/printers', function(data) {
-            node.showPrinters(data.result);
-            setTimeout(function () { node.getPrinters() }, 10000);
+        $.get('/api/connect', function(data) {
+            if (data.success && data.result) {
+                node.showPrinter(data.result);
+            }
+            setTimeout(function () { node.getPrinter() }, 3000);
         });
         return node;
     }
 });
 
 $('#progress, #error').hide();
-$('#printers').getPrinters();
+$('a.brand').getPrinter();
+//$('#jobs').getJobs();
 $('#files').getFiles();
 $('#fileupload').fileupload({
     url: '/upload',

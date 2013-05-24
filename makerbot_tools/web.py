@@ -3,7 +3,6 @@ from makerbot_tools.client import call
 import subprocess
 import bottle
 import time
-import json
 import glob
 import os
 
@@ -36,7 +35,16 @@ def call_client(method, args=None):
     method = {
         'printers': 'getprinters',
         'ports': 'getports',
+        'jobs': 'getjobs',
     }.get(method, method)
+    if method == 'connect':
+        args = {
+            'machine_name': None,
+            'port_name': None,
+            'driver_name': None,
+            'profile_name': None,
+            'persistent': False,
+        }
     code, data = call(config, method, args)
     if code == 0:
         data = dict(success=True, result=data)
