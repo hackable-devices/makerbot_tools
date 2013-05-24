@@ -45,7 +45,7 @@ class Cmd(conveyor.client._MethodCommand):
     def _set_connection(cls):
         if cls._connection is not None:
             return cls._connection
-        cls._log.warn('Get new connection')
+        cls._log.warn('get new connection')
         with open(cls._config_file) as fp:
             dct = conveyor.json.load(fp)
         config = conveyor.config.Config(cls._config_file, dct)
@@ -56,6 +56,7 @@ class Cmd(conveyor.client._MethodCommand):
 
     @classmethod
     def _reset_connection(cls):
+        cls._log.warn('reset connection')
         cls._connection = None
 
     def run(self):
@@ -63,6 +64,7 @@ class Cmd(conveyor.client._MethodCommand):
         try:
             self._set_connection()
         except Exception, e:
+            self._code = -1
             self._log.exception(e)
             self._reset_connection()
         else:
@@ -76,6 +78,7 @@ class Cmd(conveyor.client._MethodCommand):
             try:
                 self._jsonrpc.run()
             except Exception as e:
+                self._code = -1
                 self._log.exception(e)
                 self._reset_connection()
                 self._stop_event_threads()
