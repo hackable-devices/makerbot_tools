@@ -68,9 +68,9 @@ $.fn.extend({
 });
 
 $('#progress, #error').hide();
-$('a.brand').getPrinter();
-$('#jobs').getJobs();
-$('#files').getFiles();
+//$('a.brand').getPrinter();
+//$('#jobs').getJobs();
+//$('#files').getFiles();
 $('#fileupload').fileupload({
     url: '/upload',
     type: "PUT",
@@ -93,3 +93,39 @@ $('#fileupload').fileupload({
 });
 
 });
+
+
+
+function PrinterCtrl($scope, $http) {
+    $scope.title = 'Loading...';
+
+    $scope.printer = {
+        displayName: 'Loading...',
+        uniqueName: '',
+        state: 'IDLE' // 'DISCONNECTED'
+    }
+
+    $scope.idle = function() { return $scope.printer.state === 'IDLE'; }
+
+    $scope.files = [];
+    $http.get('/api/files').success(function(data) {
+        if (data.files) {
+            $scope.files = data.files;
+        }
+    });
+
+    $scope.refresh = function() {
+        $http.get('/api/connect').success(function(data) {
+            if (data.success && data.result) {
+                var p = data.result, t = null;
+                $scope.printer = p;
+                t =  p.displayName + ' ' + p.uniqueName + ' (' + p.state + ')';
+                $scope.title = t;
+                $('title').text(t);
+            }
+            setTimeout($scope.refresh, 3000);
+        }).error($scope.refresh);
+    }
+    $scope.refresh()
+};
+

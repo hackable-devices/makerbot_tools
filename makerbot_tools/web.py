@@ -65,10 +65,14 @@ for cmd in ('connect', 'disconnect'):
     bottle.get('/api/' + cmd, callback=client_response(cmd))
 
 
+def ng(value):
+    return '{{ %s }}' % value
+
+
 @bottle.get('/')
 @bottle.view('index')
 def index():
-    return {}
+    return {'ng': ng}
 
 
 @bottle.get('/api/files')

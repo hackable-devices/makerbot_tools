@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app>
   <head>
     <meta charset="utf-8">
     <title>Loading printer...</title>
@@ -30,7 +30,7 @@
                                    <link rel="shortcut icon" href="/static/bootstrap/ico/favicon.png">
   </head>
 
-  <body>
+  <body ng-controller="PrinterCtrl">
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -39,11 +39,11 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">Loading printer...</a>
+          <a class="brand" href="#">
+            {{ng("printer.displayName")}} - {{ng("printer.uniqueName")}} ({{ng("printer.state")}})
+          </a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li><a href="/">Home</a></li>
-              <li><a href="/upload">Upload</a></li>
             </ul>
           </div>
         </div>
@@ -54,14 +54,22 @@
 
       <!-- The container for the uploaded files -->
       <div id="error" class="text-error"></div>
-      <fieldset>
+      <fieldset ng-show="!idle()">
         <legend>Jobs</legend>
         <div id="jobs"></div>
       </fieldset>
       <br>
       <fieldset>
-        <legend>Files</legend>
-        <div id="files"></div>
+        <legend>{{ng("files.length")}} Files</legend>
+        <ul >
+          <li ng-repeat="file in files">
+          <span>{{ng("file.name")}}</span>
+          <span ng-show="idle()">
+            <a class="btn btn-mini btn-primary" href="{{ng("file.print_url")}}">print</a>
+            <a class="btn btn-mini btn-danger" href="{{ng("file.delete_url")}}">delete</a>
+          </span>
+          </li>
+        </ul>
         <br>
         <span class="btn btn-success fileinput-button">
             <i class="icon-plus icon-white"></i>
@@ -83,12 +91,10 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
 
-<script src="/static/jquery/jquery.js"></script>
-<script src="/static/blueimp-file-upload/js/vendor/jquery.ui.widget.js"></script>
-<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
-<script src="/static/blueimp-file-upload/js/jquery.iframe-transport.js"></script>
-<!-- The basic File Upload plugin -->
-<script src="/static/blueimp-file-upload/js/jquery.fileupload.js"></script>
-<script src="/static/main.js"></script>
+    <script src="/static/jquery/jquery.js"></script>
+    <script src="/static/blueimp-file-upload/js/vendor/jquery.ui.widget.js"></script>
+    <script src="/static/blueimp-file-upload/js/jquery.fileupload.js"></script>
+    <script src="/static/angular/angular.js"></script>
+    <script src="/static/main.js"></script>
   </body>
 </html>
