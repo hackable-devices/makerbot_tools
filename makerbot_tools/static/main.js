@@ -50,7 +50,7 @@ $.fn.extend({
         var value = '' +
             printer.displayName + ' - ' +
             printer.uniqueName + ' ' +
-            '(' + printer.state + ') '
+            '(' + printer.state + ') ';
         $('title').text(value);
         $('a.brand').text(value);
         return this;
