@@ -54,6 +54,7 @@ class Cmd(conveyor.client._MethodCommand):
         try:
             self._connection = self._get_connection()
         except Exception, e:
+            self._code = -1
             self._log.exception(e)
             self._code = -1
         else:
@@ -66,7 +67,7 @@ class Cmd(conveyor.client._MethodCommand):
             hello_task.start()
             try:
                 self._jsonrpc.run()
-            except (Exception, socket.error) as e:
+            except Exception as e:
                 self._code = -1
                 self._log.exception(e)
                 self._stop_event_threads()
