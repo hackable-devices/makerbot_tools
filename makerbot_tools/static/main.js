@@ -1,102 +1,9 @@
 /*jslint unparam: true */
 /*global window, $ */
-$(function () {
-
-$.fn.extend({
-    showFiles: function (data) {
-        container = this;
-        container.empty()
-        $.each(data, function (index, file) {
-            node = $(
-                '<p class="file">' + file.name + ' ' +
-                // '<a class="btn btn-info btn-small"' +
-                // '   href="' + file.print_url + '">print</a>' +
-                '</p>'
-            );
-            node.appendTo(container);
-        });
-        return container;
-    },
-    getFiles: function () {
-        node = this;
-        $.get('/api/files', function(data) {
-            node.showFiles(data.files);
-        });
-        return node;
-    },
-    showJobs: function (data) {
-        container = this;
-        container.empty()
-        $.each(data, function (index, item) {
-            node = $(
-                '<p class="job">' + item + ' ' +
-                '</p>'
-            );
-            node.appendTo(container);
-        });
-        return container;
-    },
-    getJobs: function () {
-        node = this;
-        $.get('/api/jobs', function(data) {
-            if (data.success && data.result) {
-                node.showJobs(data.result);
-            }
-            setTimeout(function () { node.getJobs() }, 3000);
-        });
-        return node;
-    },
-    showPrinter: function (printer) {
-        var value = '' +
-            printer.displayName + ' - ' +
-            printer.uniqueName + ' ' +
-            '(' + printer.state + ') ';
-        $('title').text(value);
-        $('a.brand').text(value);
-        return this;
-    },
-    getPrinter: function () {
-        node = this;
-        $.get('/api/connect', function(data) {
-            if (data.success && data.result) {
-                node.showPrinter(data.result);
-            }
-            setTimeout(function () { node.getPrinter() }, 3000);
-        });
-        return node;
-    }
-});
-
 $('#progress, #error').hide();
-//$('a.brand').getPrinter();
-//$('#jobs').getJobs();
-//$('#files').getFiles();
-$('#fileupload').fileupload({
-    url: '/upload',
-    type: "PUT",
-    multipart: true,
-    dataType: 'json',
-    done: function (e, data) {
-        $('#files').showFiles(data.result.files);
-        $('#progress').hide();
-    },
-    fail: function (e, data) {
-        $('#error').text('Bad request').show();
-        $('#progress').hide();
-        setTimeout(function() { $('#error').hide()}, 3000);
-    },
-    progressall: function (e, data) {
-        var progress = parseInt(data.loaded / data.total * 100, 10);
-        $('#progress').show();
-        $('#progress .bar').css('width', progress + '%');
-    }
-});
-
-});
-
-
 
 function PrinterCtrl($scope, $http) {
+    $scope.timeout = 3000;
     $scope.title = 'Loading...';
 
     $scope.printer = {
@@ -106,6 +13,8 @@ function PrinterCtrl($scope, $http) {
     }
 
     $scope.idle = function() { return $scope.printer.state === 'IDLE'; }
+
+    $scope.jobs = [];
 
     $scope.files = [];
     $http.get('/api/files').success(function(data) {
@@ -122,10 +31,42 @@ function PrinterCtrl($scope, $http) {
                 t =  p.displayName + ' ' + p.uniqueName + ' (' + p.state + ')';
                 $scope.title = t;
                 $('title').text(t);
-            }
-            setTimeout($scope.refresh, 3000);
-        }).error($scope.refresh);
+                if (!$scope.idle()) {
+                    $http.get('/api/jobs').success(function(data) {
+                        if (data.success && data.result) {
+                            $scope.jobs = data.result;
+                        }
+                        $scope.set_timeout()
+                    }).error($scope.set_timeout);
+                } else { $scope.set_timeout() }
+            } else { $scope.set_timeout() }
+        }).error($scope.set_timeout);
+    }
+    $scope.set_timeout = function() {
+        setTimeout($scope.refresh, $scope.timeout);
     }
     $scope.refresh()
+
+    $('#fileupload').fileupload({
+        url: '/upload',
+        type: "PUT",
+        multipart: true,
+        dataType: 'json',
+        done: function (e, data) {
+            $scope.files = data.result.files;
+            $('#progress').hide();
+        },
+        fail: function (e, data) {
+            $('#error').text('Bad request').show();
+            $('#progress').hide();
+            setTimeout(function() { $('#error').hide()}, 3000);
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $('#progress').show();
+            $('#progress .bar').css('width', progress + '%');
+        }
+    });
+
 };
 
