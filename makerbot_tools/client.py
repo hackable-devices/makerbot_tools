@@ -7,19 +7,25 @@ import conveyor.client
 
 class Cmd(conveyor.client._MethodCommand):
 
-    _connection = None
     _log = logging.getLogger('client')
+    _config_file = None
+    _connection = None
+    _timeout = None
 
     def __init__(self, config_file, method, args, timeout=2.):
         self.method = method
         self.args = args
-        self.timeout = timeout
-        self.config_file = config_file
         self._jsonrpc = None
         self._stop = False
         self._code = 0
         self._result = None
         self._event_threads = []
+        self._init_class()
+
+    @classmethod
+    def _init_class(cls, config_file, timeout):
+        cls.timeout = timeout
+        cls.config_file = config_file
 
     def _init_event_threads(self):
         eventqueue = conveyor.event.geteventqueue()
@@ -35,21 +41,27 @@ class Cmd(conveyor.client._MethodCommand):
             if thread.is_alive():
                 thread.join(1)
 
-    def _get_connection(self):
-        if self._connection is not None:
-            return self._connection
-        with open(self.config_file) as fp:
+    @classmethod
+    def _set_connection(cls):
+        if cls._connection is not None:
+            return cls._connection
+        cls._log.warn('Get new connection')
+        with open(cls._config_file) as fp:
             dct = conveyor.json.load(fp)
-        config = conveyor.config.Config(self.config_file, dct)
+        config = conveyor.config.Config(cls._config_file, dct)
         address = config.get('common', 'address')
         address = conveyor.address.Address.address_factory(address)
-        self._connection = address.connect()
-        self._connection._socket.settimeout(self.timeout)
+        cls._connection = address.connect()
+        cls._connection._socket.settimeout(cls._timeout)
+
+    @classmethod
+    def _reset_connection(cls):
+        cls._connection = None
 
     def run(self):
         self._log.debug('running %s(%r)', self.method, self.args)
         try:
-            self._get_connection()
+            self._set_connection()
         except Exception, e:
             self._log.exception(e)
         else:
@@ -64,7 +76,7 @@ class Cmd(conveyor.client._MethodCommand):
                 self._jsonrpc.run()
             except Exception as e:
                 self._log.exception(e)
-                self._connection = None
+                self._reset_connection()
                 self._stop_event_threads()
             else:
                 self._stop_event_threads()
