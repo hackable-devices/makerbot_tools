@@ -50,8 +50,8 @@ class Cmd(conveyor.client._MethodCommand):
             self._log.exception(e)
             pass
         else:
-            self._init_event_threads()
             self._connection._socket.settimeout(self.timeout)
+            self._init_event_threads()
             self._jsonrpc = conveyor.jsonrpc.JsonRpc(
                 self._connection, self._connection)
             hello_task = self._jsonrpc.request('hello', {})
@@ -81,7 +81,7 @@ class Cmd(conveyor.client._MethodCommand):
 lock = threading.Lock()
 
 
-def call(config_file, method, args={}, timeout=.1):
+def call(config_file, method, args={}, timeout=4):
     lock.acquire_lock(True)
     result = -1, None
     try:
