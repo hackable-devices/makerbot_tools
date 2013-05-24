@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from makerbot_tools.client import call
 import subprocess
 import bottle
 import time
@@ -19,21 +20,28 @@ client = os.path.join(
     os.path.dirname(dirname),
     'bin', 'conveyor-client')
 
+config = os.path.join(
+    os.path.dirname(dirname),
+    'conveyor-dev.conf')
+
 bottle.TEMPLATE_PATH.append(
     os.path.join(dirname, 'views')
 )
 static_root = os.path.join(dirname, 'static')
 
 
-def call_client(*args):
-    try:
-        data = subprocess.check_output([client] + list(args))
-    except subprocess.CalledProcessError:
-        bottle.abort(500)
-    if data.strip():
-        data = dict(result=json.loads(data))
+def call_client(method, args=None):
+    if args is None:
+        args = {}
+    method = {
+        'printers': 'getprinters',
+        'ports': 'getports',
+    }.get(method, method)
+    code, data = call(config, method, args)
+    if code == 0:
+        data = dict(success=True, result=data)
     else:
-        data = dict(result=None)
+        data = dict(success=False)
     return data
 
 
@@ -43,7 +51,7 @@ def client_response(*args):
     return req
 
 for cmd in ('printers', 'profiles', 'jobs', 'drivers'):
-    bottle.get('/api/' + cmd, callback=client_response(cmd, '-j'))
+    bottle.get('/api/' + cmd, callback=client_response(cmd))
 
 for cmd in ('connect', 'disconnect'):
     bottle.get('/api/' + cmd, callback=client_response(cmd))
@@ -69,13 +77,12 @@ def files():
 
 @bottle.get('/api/print/:filename')
 def print_file(filename=None):
-    # need to interact with client
     p = subprocess.Popen(
         [client, 'print', '--has-start-end', filename],
         close_fds=True,
     )
     time.sleep(1)
-    data = call_client('jobs', '-j')
+    data = call_client('jobs')
     if p.poll() is None:
         # process working
         return dict(success=True, result=data)
