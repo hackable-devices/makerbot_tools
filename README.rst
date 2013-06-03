@@ -39,7 +39,9 @@ Launch the server::
 
 Launch the webserver::
 
-    $ ./server.py
+    $ sudo bin/conveyor-ui
+    
+:hint: The server will be available at http://localhost:8080 by default
 
 Validate and Print something::
 
