@@ -112,7 +112,7 @@ def post_crons():
                       'file': os.path.join(upload_dir, data.get('file'))})
     crontab = Crontab(printer, upload_dir=upload_dir)
     crontab.write(tasks)
-    return crons()
+    bottle.redirect('/crons')
 
 
 @bottle.get('/api/files')

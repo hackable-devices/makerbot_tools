@@ -56,7 +56,6 @@ class Cmd(conveyor.client._MethodCommand):
         except Exception, e:
             self._code = -1
             self._log.exception(e)
-            self._code = -1
         else:
             self._init_event_threads()
             self._jsonrpc = conveyor.jsonrpc.JsonRpc(
