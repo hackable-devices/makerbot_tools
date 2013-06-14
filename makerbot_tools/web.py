@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from makerbot_tools.client import call
+from makerbot_tools.crontab import Crontab
 import subprocess
 import bottle
 import time
@@ -18,6 +19,10 @@ dirname = os.path.abspath(os.path.dirname(__file__))
 client = os.path.join(
     os.path.dirname(dirname),
     'bin', 'conveyor-client')
+
+printer = os.path.join(
+    os.path.dirname(dirname),
+    'bin', 'print')
 
 config = os.path.join(
     os.path.dirname(dirname),
@@ -73,6 +78,41 @@ def ng(value):
 @bottle.view('index')
 def index():
     return {'ng': ng}
+
+
+@bottle.get('/crons')
+@bottle.view('cron')
+def crons():
+    filenames = []
+    for filename in sorted(glob.glob(os.path.join(upload_dir, '*.gcode'))):
+        basename = os.path.basename(filename)
+        filenames.append(basename)
+
+    crontab = Crontab(printer)
+    crontab.read()
+
+    return {'ng': ng, 'crontab': crontab, 'filenames': filenames}
+
+
+@bottle.post('/crons')
+def post_crons():
+    tasks = []
+    mapping = {}
+    data = bottle.request.POST
+    for k, v in data.items():
+        if k.startswith('cron_') or k.startswith('file_'):
+            k, i = k.split('_')
+            task = mapping.setdefault(i, {})
+            if k == 'file':
+                v = os.path.join(upload_dir, v)
+            task[k] = v
+    tasks.extend([v for k, v in sorted(mapping.items())])
+    if data.get('file'):
+        tasks.append({'cron': data.get('cron'),
+                      'file': os.path.join(upload_dir, data.get('file'))})
+    crontab = Crontab(printer, upload_dir=upload_dir)
+    crontab.write(tasks)
+    return crons()
 
 
 @bottle.get('/api/files')

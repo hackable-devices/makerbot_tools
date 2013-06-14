@@ -1,0 +1,23 @@
+<form action="/crons" method="POST">
+  %for i, item in crontab:
+  <div>
+    <input type="text" name="cron_{{i}}" value="{{item[0]}}" />
+    <select name="file_{{i}}">
+      %for filename in filenames:
+      <option value="{{filename}}">{{filename}}</option>
+      %end
+    </select>
+  </div>
+  %end
+  <div>
+    <input type="text" name="cron" value="* * * * *" />
+    <select name="file">
+      <option value="">Select one...</option>
+      %for filename in filenames:
+      <option value="{{filename}}">{{filename}}</option>
+      %end
+    </select>
+  </div>
+  <input type="submit" name="submit" value="Submit" />
+</form>
+%rebase layout ng=ng

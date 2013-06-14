@@ -43,9 +43,9 @@ function PrinterCtrl($scope, $http) {
         }).error($scope.set_timeout);
     }
     $scope.set_timeout = function() {
-        setTimeout($scope.refresh, $scope.timeout);
+        // setTimeout($scope.refresh, $scope.timeout);
     }
-    $scope.refresh()
+    // $scope.refresh()
 
     $('#fileupload').fileupload({
         url: '/upload',
