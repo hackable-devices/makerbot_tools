@@ -3,21 +3,22 @@
   <div>
     <input type="text" name="cron_{{i}}" value="{{item[0]}}" />
     <select name="file_{{i}}">
-      %for filename in filenames:
-      <option value="{{filename}}">{{filename}}</option>
+      %for value, selected in crontab.select(item[1], filenames):
+      <option value="{{value}}" {{selected and 'selected="selected"'}}>{{value}}</option>
       %end
     </select>
+    <a class="btn btn-mini btn-primary" href="" ng-click="remove($event)">remove</a>
   </div>
   %end
   <div>
     <input type="text" name="cron" value="* * * * *" />
     <select name="file">
-      <option value="">Select one...</option>
+      <option value="">Select a file to add a new task...</option>
       %for filename in filenames:
       <option value="{{filename}}">{{filename}}</option>
       %end
     </select>
   </div>
-  <input type="submit" name="submit" value="Submit" />
+  <input type="submit" class="btn" name="submit" value="Submit" />
 </form>
 %rebase layout ng=ng

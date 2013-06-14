@@ -47,6 +47,10 @@ function PrinterCtrl($scope, $http) {
     }
     // $scope.refresh()
 
+    $scope.remove = function(e) {
+        $(e.target).parent('div').remove();
+    }
+
     $('#fileupload').fileupload({
         url: '/upload',
         type: "PUT",

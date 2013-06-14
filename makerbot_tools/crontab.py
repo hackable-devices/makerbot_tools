@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import subprocess
 import tempfile
+import os
 
 
 class Crontab(object):
@@ -36,7 +37,8 @@ class Crontab(object):
         return enumerate(self.tasks)
 
     def select(self, filename, filenames):
+        filename = os.path.basename(filename)
         options = []
         for n in filenames:
-            options.append({'value': n, 'selected': filename == n})
+            options.append((n, filename == n))
         return options
