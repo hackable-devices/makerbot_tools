@@ -12,15 +12,19 @@ class Crontab(object):
         self.tasks = []
 
     def read(self):
-        crontab = subprocess.check_output(['crontab', '-l'])
-        for line in crontab.split('\n'):
-            line = line.strip()
-            if not line or self.printer not in line:
-                continue
-            line = line.split(' ', 5)
-            task = line.pop()
-            filename = task.split(' ')[1]
-            self.tasks.append([' '.join(line), filename])
+        try:
+            crontab = subprocess.check_output(['crontab', '-l'])
+        except subprocess.CalledProcessError:
+            pass
+        else:
+            for line in crontab.split('\n'):
+                line = line.strip()
+                if not line or self.printer not in line:
+                    continue
+                line = line.split(' ', 5)
+                task = line.pop()
+                filename = task.split(' ')[1]
+                self.tasks.append([' '.join(line), filename])
 
     def write(self, tasks):
         fd = tempfile.NamedTemporaryFile(mode='w')
