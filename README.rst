@@ -55,3 +55,11 @@ Print useful informations::
 
     $ bin/conveyor-client printers
     $ bin/conveyor-client jobs
+
+Deployment
+==========
+
+Copy rc.local file::
+
+    $ sudo cp etc/rc.local /etc/rc.local
+    $ sudo chmod 755 /etc/rc.local
