@@ -1,0 +1,31 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+# Print the IP address
+_IP=$(hostname -I) || true
+if [ "$_IP" ]; then
+  printf "My IP address is %s\n" "$_IP"
+fi
+
+# clean makerbot_tools environment
+rm -f /home/pi/makerbot_tools/var/conveyord.pid
+rm -f /home/pi/makerbot_tools/var/conveyord.socket
+[ -d /home/pi/makerbot_tools/var ] && chown pi:pi /home/pi/makerbot_tools/var
+
+# launch makerbot_tools servers
+
+/home/pi/makerbot_tools/bin/conveyor-server start
+
+su - pi -c /home/pi/makerbot_tools/bin/conveyor-ui 2>&1 2> /home/pi/makerbot_tools/convoyer-ui.log &
+
+exit 0
