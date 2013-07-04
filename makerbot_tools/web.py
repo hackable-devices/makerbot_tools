@@ -129,10 +129,8 @@ def files():
 
 @bottle.get('/api/print/:filename')
 def print_file(filename=None):
-    p = subprocess.Popen(
-        [client, 'print', '--has-start-end', filename],
-        close_fds=True,
-    )
+    cmd = [printer, os.path.join(upload_dir, filename)]
+    p = subprocess.Popen(cmd) #, close_fds=True)
     time.sleep(1)
     data = call_client('jobs')
     if p.poll() is None:

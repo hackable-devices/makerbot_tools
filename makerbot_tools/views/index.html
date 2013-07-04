@@ -1,6 +1,13 @@
 <fieldset ng-show="!idle()">
   <legend>Jobs</legend>
-  <div id="jobs"></div>
+  <ul>
+    <li ng-repeat="job in jobs">
+      <span>{{ng("job.name")}}</span>
+      <span ng-show="job.state == 'RUNNING'" class="btn btn-small btn-success">{{ng("job.type")}} {{ng("job.state")}}</span>
+      <span ng-show="job.state != 'RUNNING'" class="btn btn-small btn-inverse">{{ng("job.type")}} {{ng("job.state")}}</span>
+      <pre style="display:none">{{ng("job")}}</span>
+    </li>
+  </ul>
 </fieldset>
 <br>
 <fieldset>
