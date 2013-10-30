@@ -41,6 +41,8 @@ def call_client(method, args=None):
         'printers': 'getprinters',
         'ports': 'getports',
         'jobs': 'getjobs',
+        'position': 'extendedposition',
+        'pause': 'pause',
     }.get(method, method)
     if method == 'connect':
         args = {
@@ -94,6 +96,25 @@ def crons():
     return {'ng': ng, 'crontab': crontab, 'filenames': filenames}
 
 
+#@bottle.get('/test')   #to test makerbot commands directly trough the browser
+#def test():
+    #cmd = [printer, os.path.join(upload_dir, filename)]
+    #p = subprocess.Popen(cmd) #, close_fds=True)
+    #time.sleep(1)
+    #args = {'machine_name': printer,}
+    #data = call_client('position', args)
+    #return data
+
+
+    
+@bottle.get('/printviewer')
+@bottle.view('printviewer.html')
+def printviewer():
+    #bottle.redirect('/printviewer') #a link was used instead of the redirect since all we want is the image to be refresed, no need for python
+    return {'ng': ng}   
+    
+    
+    
 @bottle.post('/crons')
 def post_crons():
     tasks = []
@@ -135,7 +156,7 @@ def print_file(filename=None):
     data = call_client('jobs')
     if p.poll() is None:
         # process working
-        return dict(success=True, result=data)
+        return dict(success=True, result=data, prntr=printer)
     else:
         return dict(success=False, result=data)
 

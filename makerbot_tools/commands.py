@@ -40,6 +40,7 @@ from conveyor.decorator import command
 @command(conveyor.client.VerifyS3gCommand)
 @command(conveyor.client.WaitForServiceCommand)
 @command(conveyor.client.WriteEepromCommand)
+@command(conveyor.client.GetExtendedPositionCommand) #CKAB code here
 class ClientMain(conveyor.main.AbstractMain):
     _program_name = 'conveyor'
 
