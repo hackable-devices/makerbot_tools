@@ -6,6 +6,8 @@ import bottle
 import time
 import glob
 import os
+import zmq
+from random import randint
 
 upload_dir = os.path.expanduser('~/gcodes')
 try:
@@ -110,8 +112,86 @@ def crons():
 @bottle.get('/printviewer')
 @bottle.view('printviewer.html')
 def printviewer():
+    context = zmq.Context()
+    #  Socket to talk to server
+    socket = context.socket(zmq.REQ)
+    socket.connect ("tcp://localhost:5555")
+    
+    #  Do 1 request and wait for a response
+    socket.send ("preview")
+    #  Get the reply.
+    message = socket.recv() #maybe do something with it later ? For now it stops function from finishing execution so that the retrieved image is the right one.
+    msglist = message.split("+")
+    truc = msglist[0]
+    machin = msglist[1]
+       
     #bottle.redirect('/printviewer') #a link was used instead of the redirect since all we want is the image to be refresed, no need for python
-    return {'ng': ng}   
+    return {'ng': ng, "file": truc, "status": machin}   
+    
+    
+@bottle.get('/apsetup')
+@bottle.view('apsetup.html')
+def apsetup():
+    context = zmq.Context()
+    #  Socket to talk to server
+    socket = context.socket(zmq.REQ)
+    socket.connect ("tcp://localhost:5555")
+    
+    #  Do 1 request and wait for a response
+    socket.send ("configureartefact")
+    #  Get the reply.
+    message = socket.recv() #maybe do something with it later ? For now it stops function from finishing execution so that the retrieved image is the right one.
+       
+    #bottle.redirect('/printviewer') #a link was used instead of the redirect since all we want is the image to be refresed, no need for python
+    return {'ng': ng, "file": message}   
+
+
+@bottle.get('/startapcheck')
+def startapcheck():
+    context = zmq.Context()
+    #  Socket to talk to server
+    socket = context.socket(zmq.REQ)
+    socket.connect ("tcp://localhost:5555")
+    
+    #  Do 1 request and wait for a response
+    socket.send ("startapcheck")
+    #  Get the reply.
+    message = socket.recv() #maybe do something with it later ? For now it stops function from finishing execution so that the retrieved image is the right one.
+       
+    bottle.redirect('/printviewer')
+    
+    
+@bottle.get('/stopapcheck')
+def stopapcheck():
+    context = zmq.Context()
+    #  Socket to talk to server
+    socket = context.socket(zmq.REQ)
+    socket.connect ("tcp://localhost:5555")
+    
+    #  Do 1 request and wait for a response
+    socket.send ("stopapcheck")
+    #  Get the reply.
+    message = socket.recv() #maybe do something with it later ? For now it stops function from finishing execution so that the retrieved image is the right one.
+       
+    bottle.redirect('/printviewer')
+    
+    
+    
+#@bottle.get('/apsetup')
+#@bottle.view('apsetup.html')
+#def printviewer():
+#    context = zmq.Context()
+    #  Socket to talk to server
+#    socket = context.socket(zmq.REQ)
+#    socket.connect ("tcp://localhost:5555")
+    
+    #  Do 1 request and wait for a response
+#    socket.send ("configureartefact")
+    #  Get the reply.
+#    message = socket.recv() #maybe do something with it later ? For now it stops function from finishing execution so that the retrieved image is the right one.
+       
+    #bottle.redirect('/printviewer') #a link was used instead of the redirect since all we want is the image to be refresed, no need for python
+#    return {'ng': ng, "file": message}
     
     
     

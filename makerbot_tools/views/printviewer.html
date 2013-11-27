@@ -1,4 +1,15 @@
-<img src="/static/last_captured_printer_frame.jpeg" />
+Airprinting is currently <b>{{status}}</b>
 <div>
+Build plate Snapshot:
+<div>
+<img src="/static/{{file}}" />
+<div>
+%print(file)
 <a class="btn btn-mini btn-primary" href="/printviewer">Refresh</a>
+<a class="btn btn-mini btn-primary" href="/startapcheck">Start AP Monitoring</a>
+<a class="btn btn-mini btn-primary" href="/stopapcheck">Stop AP Monitoring</a>
+<a class="btn btn-mini btn-primary" href="/apsetup">Monitoring Setup</a>
 %rebase layout ng=ng
+<div>
+[Debug] Message recieved: {{file}}+{{status}}
+<div>
