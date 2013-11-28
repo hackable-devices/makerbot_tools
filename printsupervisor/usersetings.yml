@@ -1,5 +1,5 @@
 %YAML:1.0
-minx: 0
-maxx: 1200
-miny: 0
-maxy: 700
+minx: 95
+maxx: 128
+miny: 60
+maxy: 81

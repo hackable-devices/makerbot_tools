@@ -332,6 +332,11 @@
      //getting the bounding box = minimom and maximum x and y coordinates
      void getBoundingBox(int &minx, int &maxx, int &miny, int &maxy) //TODO needs testing !!!
      {
+         minx = 100000;
+         maxx = 0;
+         miny = 100000;
+         maxy = 0;
+         
          for(int i=0; i<lastDetected.size(); i++)
          {
              if(lastDetected[i].first < minx) minx = lastDetected[i].first;
@@ -340,6 +345,7 @@
              if(lastDetected[i].second < miny) miny = lastDetected[i].second;
              else if(lastDetected[i].second > maxy) maxy = lastDetected[i].second;
          }
+         cout << "[DEBUG] inside function: " << minx << " " << maxx << " " << miny << " " << maxy << " Size of tab " << lastDetected.size() << endl; //test
      }
      
      
@@ -435,7 +441,7 @@
  
  
  string command = "ok";
- string response = "none";
+ string response = "ok";
  mutex mut;
  
  
@@ -472,7 +478,7 @@
              
              //std::this_thread::sleep_for(std::chrono::milliseconds(10)); //just in case, so as to let the main lock the mutex
              
-             if(rep != "none" && rep != "ok") //server responded none: nothing to send to client so we only send when rep != none
+             if(rep != "ok") //server responded none: nothing to send to client so we only send when rep != none
              {
                  // Send reply back to client
                  //zmq::message_t reply (rep.size);
@@ -576,8 +582,6 @@
          
          if(command == "preview") //TODO needs testing
          {
-             command = "ok";
-             
              if(viewcount>49) viewcount = 1; //we want max 50 preview images saved on disc TODO make this a parametar
              else viewcount++;
              
@@ -619,30 +623,37 @@
          }
          else if(command == "configureartefact") //TODO needs testing
          {
+             //stop ap check just in case
+             checkap = false; 
+             nonairprint = 0;
+             airprint = 0;
+             
              ght.createRtable();
              ght.accumulate(modified);
              ght.bestCandidate();
              
-             Mat setingsimg = ght.drawLastDetected(modified);
+             Mat setingsimg = ght.drawLastDetected(modified); //show where the artefact was found
              
              string staticpath = "../makerbot_tools/static/";
              string thefilename = "usersetresult"+to_string(usrrescount)+".jpg";
              imwrite(staticpath + thefilename, setingsimg);
              imshow("detection", setingsimg);
              
-             //find bounding box
-             ght.getBoundingBox(minx, maxx, miny, maxy);
+             ght.getBoundingBox(minx, maxx, miny, maxy); //find bounding box: zone in which the artefact is considered to be
              
-             FileStorage fs("usersetings.yml", FileStorage::WRITE);
-             fs << "minx" << minx;
-             fs << "maxx" << maxx;
-             fs << "miny" << miny;
-             fs << "maxy" << maxy;
-             fs.release();
+             cout << "[DEBUG] saving to file: " << minx << " " << maxx << " " << miny << " " << maxy << endl; //test 
+             
+             //writing to file
+             FileStorage fs2("usersetings.yml", FileStorage::WRITE);
+             fs2 << "minx" << minx;
+             fs2 << "maxx" << maxx;
+             fs2 << "miny" << miny;
+             fs2 << "maxy" << maxy;
+             fs2.release();
              
              response = thefilename;
              
-             if(usrrescount>5) usrrescount=1;
+             if(usrrescount>5) usrrescount=1; //wa want 5 backups. We should not go under 2 because the browser might not empty cach if the file name doesn't change between page refreshes
              else usrrescount++;
          }
          else if(command == "maketemplate") //TODO under construction ! o_O
@@ -685,6 +696,8 @@
              }
              
          }
+         
+         command = "ok";
          mut.unlock();
          
          //std::this_thread::sleep_for(std::chrono::milliseconds(10)); //just in case, so as to give the thread time to lock the mutex
