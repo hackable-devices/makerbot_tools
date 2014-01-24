@@ -128,6 +128,13 @@ def printviewer():
     #bottle.redirect('/printviewer') #a link was used instead of the redirect since all we want is the image to be refresed, no need for python
     return {'ng': ng, "file": truc, "status": machin}   
     
+
+    
+@bottle.get('/apsetupconfirm')
+@bottle.view('apsetupconfirm.html')
+def apsetup():
+    return {'ng': ng}   
+    
     
 @bottle.get('/apsetup')
 @bottle.view('apsetup.html')

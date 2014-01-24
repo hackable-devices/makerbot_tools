@@ -228,7 +228,7 @@
          if (phimax==pi && phimin==-pi) R--;     
          int r0 = -floor(phimin/deltaphi);
          int matSizep_S[] = {X, Y, S, R};
-         accum.create(4, matSizep_S, CV_16S); //TODO check if this erases an already existant mat, which is what we want
+         accum.create(4, matSizep_S, CV_16S);
          accum = Scalar::all(0);
          // icrease accum cells with hits corresponding with slope in Rtable vector rotatated and scaled
          float inv_wtemplate_rangeXY = (float)1/(wtemplate*rangeXY);
@@ -557,11 +557,6 @@
      
      thread commander(commandRecever); //starts the command recever thread that will catch client commands
      
-     //Initialise detection class
-     GenHoughTrnf ght(templatepath, contourpath);
-     ght.createRtable();
-     
-     
      while (com != "stop")
      {
          mut.lock();
@@ -583,6 +578,8 @@
          //imshow("Output", frame); //test
          //cvWaitKey(10); //test
          
+         
+         GenHoughTrnf ght(templatepath, contourpath); //TODO maybe put this outside of our while loop to get better speed ? Will it work ?
          
          // this is not executed when we do not wish to use detection as it takes lots of resources.
          //if( (command != "printpreview")&&(command != "maketemplate")/*&&(command != "stopapcheck")*/  ) //for testing and template generation 9since feature still isnt implmented)
@@ -656,6 +653,7 @@
              nonairprint = 0;
              airprint = 0;
              
+             ght.createRtable();
              ght.accumulate(modified);
              ght.bestCandidate();
              
@@ -705,6 +703,7 @@
          
          if(checkap)
          {  
+             ght.createRtable();
              ght.accumulate(modified);
              ght.bestCandidate();
              Mat setingsimg = ght.drawLastDetected(modified);
